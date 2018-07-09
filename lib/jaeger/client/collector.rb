@@ -10,7 +10,10 @@ module Jaeger
       end
 
       def send_span(span, end_time)
+        
         context = span.context
+        Jaeger.log "sending #{context.to_s} span to buffer"
+
         start_ts, duration = build_timestamps(span, end_time)
         return if !context.sampled? && !context.debug?
 

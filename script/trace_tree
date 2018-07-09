@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+require 'byebug'
+require 'bundler'
+Bundler.setup
+
+require 'jaeger/client'
+
+def inspect_span(span)
+  puts span&.context
+end
+
+host = ENV['JAEGER_HOST'] || '127.0.0.1'
+port = ENV['JAEGER_HOST'] || 6831
+tracer1 = Jaeger::Client.build(host: host, port: port.to_i, service_name: 'test1-service', flush_interval: 1)
+
+active_scope = tracer1.start_active_span('root-span1')
+span1 = tracer1.active_span
+abort "Blank root span" unless span1
+
+span2 = tracer1.start_span('child-span1')
+span2.finish
+
+span3 = tracer1.start_span('child-span2')
+span3.finish
+
+span1.finish
+active_scope.close
+
+sleep 2
+
+inspect_span tracer1.active_span
+#byebug
+
+puts '==ok'

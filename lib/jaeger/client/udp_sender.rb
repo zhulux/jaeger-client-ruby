@@ -42,7 +42,11 @@ module Jaeger
         # Sending spans in a separate thread to avoid blocking the main thread.
         @thread = Thread.new do
           loop do
-            emit_batch(@collector.retrieve)
+            spans = @collector.retrieve
+            #print "\r==#{Time.now} emiting #{spans.size} spans"
+            emit_batch(spans)
+
+            #emit_batch(@collector.retrieve)
             sleep @flush_interval
           end
         end

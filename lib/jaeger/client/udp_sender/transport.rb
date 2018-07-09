@@ -18,7 +18,10 @@ module Jaeger
         end
 
         def flush
-          data = @buffer.read(@buffer.available)
+          num = @buffer.available
+          Jaeger.log "udp sender will flush #{num} bytes"
+          data = @buffer.read(num)
+          #data = @buffer.read(@buffer.available)
           send_bytes(data)
         end
 
@@ -34,6 +37,7 @@ module Jaeger
         rescue Errno::ECONNREFUSED
           warn 'Unable to connect to Jaeger Agent'
         rescue StandardError => e
+          Jaeger.log "=*" * 20
           warn "Unable to send spans: #{e.message}"
         end
       end

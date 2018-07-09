@@ -37,5 +37,21 @@ module Jaeger
       sender.start
       Tracer.new(collector, sender, sampler)
     end
+
   end
+
+  class << self
+    attr_accessor :logger
+
+    def debuging?
+      ENV['DEBUG_JAEGER']
+    end
+
+    def log(str)
+      return unless logger
+      return unless debuging?
+      logger.info "==[jaeger client] #{str}"
+    end
+  end
+  self.logger = Logger.new(STDOUT)
 end
